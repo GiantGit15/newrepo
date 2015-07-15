@@ -1,0 +1,5 @@
+bin/assets/*          binary
+bin/index.html        binary
+public/assets/*.js    binary
+public/assets/*.css   binary
+spec/cassettes/**     binary

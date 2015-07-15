@@ -1,0 +1,36 @@
+build:
+  environment:
+    ruby: '2.1.2'
+    postgresql: true
+    mysql: false
+
+  project_setup:
+    before:
+      - cp config/database.yml.ci config/database.yml
+      - cp config/application.yml.sample config/application.yml
+
+  dependencies:
+    before:
+      - sudo apt-get install imagemagick --yes
+
+    # Do not install unnecessary NPM packages.  Bundler is enough.
+    override:
+      - 'bundle check --path=vendor/bundle || bundle install --path=vendor/bundle --clean '
+
+  tests:
+    before:
+      - 'bundle exec rake db:drop db:create db:schema:load'
+
+    override:
+      -
+        command: 'SCRUTINIZER_ACCESS_TOKEN=b15efb8aae26856b0692a0ff4f8fb199bd35f0422ffbc9a5acb6a9a440a7524b bundle exec rspec spec'
+        environment:
+          'SCRUTINIZER_CC_FILE': 'my-coverage'
+        coverage:
+          file: 'my-coverage'
+          format: 'rb-cc'
+
+checks:
+  ruby:
+    code_rating: true
+    duplicate_code: true
